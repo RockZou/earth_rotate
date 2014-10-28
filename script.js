@@ -117,7 +117,7 @@ function onWindowResize() {
 
 window.addEventListener('deviceorientation', function(event) {
 	//console.log('orientation!');
-	$('.someText').html(event.alpha);
+	$('.someText').html('orientation!');
 	console.log('alpha is'+event.alpha);
   var rotX = event.alpha;
   var rotY = event.beta;
