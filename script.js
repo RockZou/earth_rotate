@@ -1,4 +1,4 @@
-/***********three stuff********************/
+/**********three stuff********************/
 
 
 var scene = new THREE.Scene();
@@ -12,6 +12,10 @@ var $container= $('.container');
 
 var geometry = new THREE.SphereGeometry( 1.5, 32, 32 );
 
+var rotZ=0;
+var rotY=0;
+var rotX=0;
+
 // var material = new THREE.MeshLambertMaterial(
 // {
 //	color: 0xffff00
@@ -20,7 +24,7 @@ var geometry = new THREE.SphereGeometry( 1.5, 32, 32 );
 
 
 
-camera.position.z = 3;
+camera.position.z = 5;
 
 
 //*********Material**********//
@@ -67,6 +71,12 @@ var ambientLight = new THREE.AmbientLight(0x222222);
 	scene.add(ambientLight);
 
 
+// var worldRotationMatrix = new THREE.Matrix4();
+// 	worldRotationMatrix.set(Math.cos(-0.4),-Math.sin(-0.4),0,0,
+// 							Math.sin(-0.4),Math.cos(-0.4),0,0,
+// 							0,0,1,0,
+// 							0,0,0,1);
+// console.log(worldRotationMatrix);
 
 /*********END lighting*********/
 
@@ -84,10 +94,38 @@ render();
 function rotation()
 {
 	//sphere.rotation.x += 0.01;
-	sphere.rotation.y += 0.005;
-	sphere.rotation.z = 0.5;
+	sphere.rotation.y = rotY;
+	// sphere.rotation.y = Math.PI/2;
+
+	//sphere.setFromMatrixPosition(worldRotationMatrix);
+	sphere.rotation.z = rotZ;
+	sphere.rotation.x = rotX;
 }
+
+$('.container').click(function(){
+	rotZ+=0.05;
+	console.log(rotZ);
+});
+
+
+function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+}
+
+window.addEventListener('deviceorientation', function(event) {
+	//console.log('orientation!');
+	$('.someText').html(event.alpha);
+	console.log('alpha is'+event.alpha);
+  var rotX = event.alpha;
+  var rotY = event.beta;
+  var rotZ = event.gamma;
+  // Do something
+}, false);
 
 $container.append(renderer.domElement);
 
-/**********END three Stuff****************/
+
+/**********END three Stuff***************/
