@@ -119,9 +119,9 @@ window.addEventListener('deviceorientation', function(event) {
 	//console.log('orientation!');
 	$('.someText').html('orientation!');
 	console.log('alpha is'+event.alpha);
-  var rotX = event.alpha;
-  var rotY = event.beta;
-  var rotZ = event.gamma;
+  rotX = event.alpha;
+  rotY = event.beta;
+  rotZ = event.gamma;
   // Do something
 }, false);
 
