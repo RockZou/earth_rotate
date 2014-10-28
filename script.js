@@ -12,15 +12,32 @@ var $container= $('.container');
 
 var geometry = new THREE.SphereGeometry( 1.5, 32, 32 );
 
+
+var autoMode=false;//determines if earth should rotate on its own or depend on orientation
+//constant showcase-like rotation
+var cRotX=0;
+var cRotY=0;
+var cRotZ=0;
+
+//rotation from orientation
 var rotZ=0;
 var rotY=0;
 var rotX=0;
 
-// var material = new THREE.MeshLambertMaterial(
-// {
-//	color: 0xffff00
-// //	wireframe: true
-// });
+//the x y z rotate values after being off-setted
+var newX=0;
+var newY=0;
+var newZ=0;
+
+
+
+//detect if this is the first time to receive the orientation data
+var firstRecieved=false;
+var offsetX=0.0;
+var offsetY=0.0;
+var offsetZ=0.0;
+
+
 
 
 
@@ -48,17 +65,6 @@ scene.add( sphere );
 
 
 /******Lighting**********/
-// create a point light
-// var pointLight =
-//   new THREE.PointLight(0xFFFFFF);
-
-// // set its position
-// pointLight.position.x = 10;
-// pointLight.position.y = 50;
-// pointLight.position.z = 130;
-
-// // add to the scene
-// scene.add(pointLight);
 
 
 // create a directional light
@@ -70,6 +76,8 @@ var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 var ambientLight = new THREE.AmbientLight(0x222222);
 	scene.add(ambientLight);
 
+
+/*!!!!!!!HOW TO DO WORLD MATRIX TRANSFORMATION?!!!!!!*/
 
 // var worldRotationMatrix = new THREE.Matrix4();
 // 	worldRotationMatrix.set(Math.cos(-0.4),-Math.sin(-0.4),0,0,
@@ -93,41 +101,70 @@ render();
 
 function rotation()
 {
-	//sphere.rotation.x += 0.01;
-	sphere.rotation.y = rotY;
-	// sphere.rotation.y = Math.PI/2;
+	if (autoMode)// the earth should rotate by itself, not being affected by the 
+	{
+		sphere.rotation.y += cRotY;
+		sphere.rotation.x += cRotX;
+		sphere.rotation.z += cRotZ;
+	}
 
 	//sphere.setFromMatrixPosition(worldRotationMatrix);
-	sphere.rotation.z = rotZ;
-	sphere.rotation.x = rotX;
+//	sphere.rotation.z = rotZ;
+	else
+	{
+		sphere.rotation.x = rotX;
+		sphere.rotation.y = rotY;
+	}
 }
 
+//click toggles between 
 $('.container').click(function(){
-	rotZ+=0.05;
-	console.log(rotZ);
+	console.log('I am being clicked! Ouch!');
+	autoMode=!autoMode;
+	offsetX+=newX;
+	offsetY+=newY;
+	offsetZ+=newZ;
+
 });
 
 
-function onWindowResize() {
+window.addEventListener('deviceorientation', function(event) {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-				renderer.setSize( window.innerWidth, window.innerHeight );
+
+  $('.someText').html('a='+event.alpha+' b='+event.beta+' c='+event.gamma);
+
+
+// if this is the first time receiving data, set this data to offset data
+  if (!firstRecieved)
+{
+	offsetX=event.beta;
+	offsetY=event.gamma;
+	offsetZ=event.alpha;
+	firstRecieved=true;
 }
 
-window.addEventListener('deviceorientation', function(event) {
-	//console.log('orientation!');
+ newX=event.beta-offsetX;
+ newY=event.gamma-offsetY;
+ newZ=event.alpha-offsetZ;
 
-if (event.alpha!==null)
-{
-  $('.someText').html('a='+event.alpha+' b='+event.beta+' c='+event.gamma);
-  //rotX = event.alpha/180.0*3.14;
-  rotX = event.beta/180.0*3.14;
-  rotY = event.gamma/180.0*3.14;
+  rotX = newX/180.0*3.14;
 
-}}, false);
+  rotY = newY/180.0*3.14;
+
+}, false);
 
 $container.append(renderer.domElement);
+
+
+
+//!!!!!!! RESPONSIVE CODE NOT WORKING?!!!!//
+
+function onWindowResize() {
+
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+}
 
 
 /**********END three Stuff***************/
