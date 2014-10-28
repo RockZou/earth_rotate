@@ -117,14 +117,16 @@ function onWindowResize() {
 
 window.addEventListener('deviceorientation', function(event) {
 	//console.log('orientation!');
-	$('.someText').html('orientation!');
-	console.log('alpha is'+event.alpha);
-  rotX = event.alpha;
-  rotY = event.beta;
-  rotZ = event.gamma;
-  // Do something
-}, false);
 
+if (event.alpha!==null)
+{
+  console.log('alpha is'+event.alpha);
+  rotX = event.alpha/180.0*3.14;
+  rotY = event.beta/180.0*3.14;
+  rotZ = event.gamma/180.0*3.14;
+
+  $('.someText').html('a='+rotX+' b='+rotY+' c='+rotZ);
+}}, false);
 $container.append(renderer.domElement);
 
 
