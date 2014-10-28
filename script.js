@@ -120,7 +120,7 @@ window.addEventListener('deviceorientation', function(event) {
 
 if (event.alpha!==null)
 {
-  $('.someText').html('a='+alpha+' b='+beta+' c='+gamma);
+  $('.someText').html('a='+event.alpha+' b='+event.beta+' c='+event.gamma);
   //rotX = event.alpha/180.0*3.14;
   rotX = event.beta/180.0*3.14;
   rotY = event.gamma/180.0*3.14;
