@@ -19,9 +19,10 @@ var newY=0;
 var newZ=0;
 
 
-var earth,moon;
+var earth,moon, theSun;
 var theEarthSystem;
 var theMoonSystem;
+var theSunSystem;
 var geometry;
 
 
@@ -29,7 +30,7 @@ var tiltAngle=-23.5/180.0*Math.PI;
 var moonOrbitR=5;
 var moonOrbitA=0;
 
-var theEarthSystemOrbitR=15;
+var theEarthSystemOrbitR=25;
 var theEarthSystemOrbitA=0;
 
 //detect if this is the first time to receive the orientation data
@@ -50,7 +51,7 @@ function init(){
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 
-	camera.position.z = 30;
+	camera.position.z = 50;
 
 //************Create the Earth System*****//
 
@@ -109,6 +110,27 @@ function init(){
 	scene.add(theMoonSystem);
 
 //********END Moon System******//
+//********Sun ***************//
+
+	theSunSystem = new THREE.Object3D();
+
+	geometry = new THREE.SphereGeometry( 10, 32, 32 );
+	//*********Material**********//
+	material = new THREE.MeshLambertMaterial(
+	{
+		emissive: 0xdddddd,
+		map: THREE.ImageUtils.loadTexture('src/sunmap.jpg')
+	}
+	);//endPhongMaterial
+
+	theSun = new THREE.Mesh( geometry, material );
+
+	theSunSystem.add(theSun);
+	scene.add(theSunSystem);
+
+//*********END SUN************//
+
+
 
 	/******Lighting**********/
 	// create a directional light
