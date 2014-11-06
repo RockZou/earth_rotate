@@ -1,7 +1,7 @@
 /*********three stuff********************/
 
 //document.body.appendChild( renderer.domElement );
-var scene,camera,renderer;
+var scene,camera,renderer,controls;
 var $container= $('.container');
 
 var autoMode=true;//determines if earth should rotate on its own or depend on orientation
@@ -62,6 +62,9 @@ function init(){
 	renderer.setSize( window.innerWidth, window.innerHeight );
 
 	camera.position.z = 50;
+
+	controls = new THREE.OrbitControls( camera );
+//  	controls.addEventListener( 'change', render );
 
 //************Create the Earth System*****//
 
@@ -161,6 +164,7 @@ function init(){
 function animate() {
 
     requestAnimationFrame( animate );
+    controls.update();
 
 	rotation();
 
@@ -229,18 +233,22 @@ function rotateMoon()
 	switch (lookatBody)
 	{
 		case 0:// looking at the sun
-			camera.position.set(theSunSystem.position.x, theSunSystem.position.y,theSunSystem.position.z+50);
+			//camera.position.set(theSunSystem.position.x, theSunSystem.position.y,theSunSystem.position.z+50);
 			camera.lookAt(theSunSystem.position);
 		break;
 
 		case 1://looking at the earth
-			camera.position.set(theEarthSystem.position.x, theEarthSystem.position.y, theEarthSystem.position.z+10);
+			//camera.position.set(theEarthSystem.position.x, theEarthSystem.position.y, theEarthSystem.position.z+10);
 			camera.lookAt(theEarthSystem.position);	
 		break;
 
 		case 2:
-			camera.position.set(theMoonSystem.position.x+moon.position.x,theMoonSystem.position.y+moon.position.y,theMoonSystem.position.z+moon.position.z+3);
-			camera.lookAt(theMoonSystem.position.clone().add(moon.position));
+		var theMoonPos= new THREE.Vector3();
+		theMoonPos.setFromMatrixPosition(moon.matrixWorld );
+		//camera.position.set(theMoonPos.x,theMoonPos.y,theMoonPos.z+3);
+		camera.lookAt(theMoonPos);
+			//camera.position.set(theMoonSystem.position.x+moon.position.x,theMoonSystem.position.y+moon.position.y,theMoonSystem.position.z+moon.position.z+3);
+			//camera.lookAt(theMoonSystem.position.clone().add(moon.position));
 		break;
 	}
 
@@ -266,7 +274,8 @@ function ui(){
 	//click toggles between 
 	$('.container').click(function(){
 		console.log('I am being clicked! Ouch!');
-		autoMode=!autoMode;
+		lookatBody=(lookatBody+1)%3;
+		//autoMode=!autoMode;
 		offsetX+=newX;
 		offsetY+=newY;
 		offsetZ+=newZ;
@@ -294,9 +303,21 @@ function ui(){
 
 
 	window.addEventListener('keydown', onKeyUp,false); 
+	window.addEventListener( 'resize', onWindowResize, false );
 
 
 }//END UI
+
+function onWindowResize() {
+
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize( window.innerWidth, window.innerHeight );
+
+  render();
+
+}
 
 
 
