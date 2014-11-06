@@ -274,7 +274,7 @@ function ui(){
 	//click toggles between 
 	$('.container').click(function(){
 		console.log('I am being clicked! Ouch!');
-		lookatBody=(lookatBody+1)%3;
+		//lookatBody=(lookatBody+1)%3;
 		//autoMode=!autoMode;
 		offsetX+=newX;
 		offsetY+=newY;
