@@ -1,4 +1,4 @@
-/**********three stuff********************/
+/*********three stuff********************/
 
 //document.body.appendChild( renderer.domElement );
 var scene,camera,renderer;
@@ -25,6 +25,12 @@ var theMoonSystem;
 var theSunSystem;
 var geometry;
 
+//camera related
+var lookatBody=0;// the body the camera is looking at
+var campos;
+var camrot;
+var pos;
+
 
 var tiltAngle=-23.5/180.0*Math.PI;
 var moonOrbitR=5;
@@ -39,6 +45,7 @@ var offsetX=0.0;
 var offsetY=0.0;
 var offsetZ=0.0;
 
+
 init();
 animate();
 ui();
@@ -47,7 +54,10 @@ function init(){
 
 
 	scene = new THREE.Scene();
-	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+	camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 1000 );
+	camrot=new THREE.Vector3(0,0,0);
+	campos=camera.position.clone();
+
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -118,7 +128,7 @@ function init(){
 	//*********Material**********//
 	material = new THREE.MeshLambertMaterial(
 	{
-		emissive: 0xdddddd,
+		emissive: 0xbbbbbb,
 		map: THREE.ImageUtils.loadTexture('src/sunmap.jpg')
 	}
 	);//endPhongMaterial
@@ -139,7 +149,7 @@ function init(){
 	    pointLight.position.set(0,0,0);
 	    scene.add(pointLight);
 
-	var ambientLight = new THREE.AmbientLight(0x222222);
+	var ambientLight = new THREE.AmbientLight(0x444444);
 		scene.add(ambientLight);
 	/*********END lighting*********/
 
@@ -152,22 +162,19 @@ function animate() {
 
     requestAnimationFrame( animate );
 
-    render();
-
-}
-
-function render() {
 	rotation();
+
+	camTransform();
+
+
 	renderer.render( scene, camera );
+
 }
-
-
 
 
 function rotation()
 {
 	rotateEarthMoonSystem();
-
 	rotateEarth();
 	rotateMoon();
 
@@ -181,7 +188,6 @@ function rotateEarthMoonSystem()
 	theEarthSystem.position.z= Math.sin(theEarthSystemOrbitA) * theEarthSystemOrbitR;
 	theMoonSystem.position.x= theEarthSystem.position.x;
 	theMoonSystem.position.z= theEarthSystem.position.z;
-
 }
 
 function rotateEarth()
@@ -201,8 +207,59 @@ function rotateMoon()
 	moonOrbitA+=0.012;
     moon.position.x = Math.cos(moonOrbitA) * moonOrbitR;
     moon.position.z = Math.sin(moonOrbitA) * moonOrbitR;
+    moon.rotation.y+=0.01;
 }
 
+
+ function camTransform(){
+// 	camera.position.x=campos.x;
+// 	camera.position.y=campos.y;
+// 	camera.position.z=campos.z;
+	
+	console.log(campos.clone());
+
+	//camera.rotation.y = camrot.y;
+
+	camera.up = new THREE.Vector3(0,1,0);
+	//var cameraTarget = new THREE.Vector3(0,0,0);
+	//cameraTarget.add(theMoonSystem.position);
+	//cameraTarget.add(moon.position);
+	//var addOffSet= new THREE.Vector3(0,0,30);
+
+	switch (lookatBody)
+	{
+		case 0:// looking at the sun
+			camera.position.set(theSunSystem.position.x, theSunSystem.position.y,theSunSystem.position.z+50);
+			camera.lookAt(theSunSystem.position);
+		break;
+
+		case 1://looking at the earth
+			camera.position.set(theEarthSystem.position.x, theEarthSystem.position.y, theEarthSystem.position.z+10);
+			camera.lookAt(theEarthSystem.position);	
+		break;
+
+		case 2:
+			camera.position.set(theMoonSystem.position.x+moon.position.x,theMoonSystem.position.y+moon.position.y,theMoonSystem.position.z+moon.position.z+3);
+			camera.lookAt(theMoonSystem.position.clone().add(moon.position));
+		break;
+	}
+
+}
+
+function onKeyUp(event){
+	console.log("event keyCode is", event.keyCode);
+	switch (event.keyCode)
+	{
+		case 81: campos.z-=5; console.log('q is pressed'); break;//q
+		case 90: campos.z+=5; break;//z
+		case 65: campos.x-=5; break;//a
+		case 68: campos.x+=5; break;//d
+		case 87: campos.y+=5; break;//w
+		case 83: campos.y-=5; break;//s
+		case 37: camrot.y+=0.01;break;
+		case 13: lookatBody=(lookatBody+1)%3;break;
+	}
+}
 
 function ui(){
 
@@ -213,7 +270,6 @@ function ui(){
 		offsetX+=newX;
 		offsetY+=newY;
 		offsetZ+=newZ;
-
 	});
 
 
@@ -234,20 +290,17 @@ function ui(){
 
 		rotX = newX/180.0*3.14;
 		rotY = newY/180.0*3.14;
-	}, false			);
-
-	$container.append(renderer.domElement);
+	}, false			);// end event listener
 
 
+	window.addEventListener('keydown', onKeyUp,false); 
 
-	//!!!!!!! RESPONSIVE CODE NOT WORKING?!!!!//
 
-	function onWindowResize() {
-
-		camera.aspect = window.innerWidth / window.innerHeight;
-		camera.updateProjectionMatrix();
-		renderer.setSize( window.innerWidth, window.innerHeight );
-	}
 }//END UI
 
-/**********END three Stuff***************/
+
+
+
+
+$container.append(renderer.domElement);
+/**********END three Stuff**************/
